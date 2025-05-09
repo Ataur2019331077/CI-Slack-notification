@@ -16,6 +16,8 @@ def new_endpoint():
     return {"message": "This is a new endpoint!"}
 
 
-@app.get("/another-endpoint")
-def another_endpoint():
-    return {"message": "This is another endpoint in another branch!"}
+
+@app.get("/branch-created")
+def branch_created():
+    return {"message": "This is from new branch"}
+
