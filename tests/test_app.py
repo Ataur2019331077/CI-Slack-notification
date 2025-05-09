@@ -23,3 +23,8 @@ def test_branch_created():
     assert response.status_code == 200
     assert response.json() == {"message": "This is from new branch"}
 
+
+def test_check_branch():
+    response = client.get("/check-branch")
+    assert response.status_code == 200
+    assert response.json() == {"message": "This is for checking"}
