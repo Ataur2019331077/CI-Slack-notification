@@ -18,8 +18,8 @@ def test_new_endpoint():
     assert response.status_code == 200
     assert response.json() == {"message": "This is a new endpoint!"}
 
-def test_another_endpoint():
-    response = client.get("/another-endpoint")
+def test_branch_created():
+    response = client.get("/branch-created")
     assert response.status_code == 200
-    assert response.json() == {"message": "This is another endpoint in another branch!"}
+    assert response.json() == {"message": "This is from new branch"}
 
