@@ -21,3 +21,7 @@ def new_endpoint():
 def branch_created():
     return {"message": "This is from new branch"}
 
+@app.get("/branch-created-2")
+def branch_created_2():
+    return {"message": "This is from new branch 2"}
+
