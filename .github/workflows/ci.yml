@@ -1,0 +1,78 @@
+name: CI/CD for FastAPI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    - name: Install Dependencies
+      run: |
+        pip install --upgrade pip
+        pip install fastapi uvicorn pytest httpx
+
+    - name: Run Tests
+      id: run_tests
+      run: |
+        export PYTHONPATH=$PYTHONPATH:$(pwd)
+        pytest tests/ || echo "TEST_FAILED=true" >> $GITHUB_ENV
+
+    - name: Comment on PR if Tests Fail
+      if: env.TEST_FAILED == 'true'
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.payload.pull_request.number,
+            body: "❌ Tests have failed. Please check the logs and fix the issues."
+          });
+
+    - name: Comment on PR if Tests Pass
+      if: env.TEST_FAILED != 'true'
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.payload.pull_request.number,
+            body: "✅ All tests have passed! The PR is now eligible for auto-merge."
+          });
+
+    - name: Auto-Merge PR on Success
+      if: env.TEST_FAILED != 'true'
+      uses: pascalgn/automerge-action@v0.15.5
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        MERGE_METHOD: "squash"
+
+    - name: Send Slack Notification
+      if: always()
+      uses: slackapi/slack-github-action@v1.24.0
+      with:
+        payload: |
+          {
+            "text": "FastAPI CI/CD Workflow Status\n*Status:* ${{ job.status }}\n*Repository:* `${{ github.repository }}`\n*PR:* #${{ github.event.pull_request.number }} by `${{ github.actor }}`\n<View Run> https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
