@@ -14,3 +14,8 @@ def check():
 @app.get("/new-endpoint")
 def new_endpoint():
     return {"message": "This is a new endpoint!"}
+
+
+@app.get("/another-endpoint")
+def another_endpoint():
+    return {"message": "This is another endpoint in another branch!"}
