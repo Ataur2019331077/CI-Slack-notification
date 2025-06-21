@@ -56,4 +56,4 @@ Ensure you have a `.github/workflows/ci.yml` GitHub Actions file and necessary s
 
 ## 📄 License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is open source and available under the [MIT License](LICENSE.md).
